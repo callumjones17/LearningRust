@@ -8,6 +8,7 @@ fn main() {
     println!("Hello, world! {},{}", var, var);
     test();
     println!("Program Over!");
+
 }
 
 fn test(){
