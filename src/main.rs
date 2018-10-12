@@ -9,11 +9,11 @@ use rand::Rng;
 fn main() {
     let var = "Hello again";
     println!("Hello, world! {},{}", var, var);
-    test();
+    secret_number_game();
     println!("Program Over!");
 }
 
-fn test(){
+fn secret_number_game(){
 
     let rand_num = rand::thread_rng().gen_range(1,500);
 
