@@ -4,13 +4,16 @@ extern crate rand;
 
 use std::io;
 use std::cmp::Ordering;
+use std::thread;
+use std::sync::{Mutex,Arc};
 use rand::Rng;
 
 fn main() {
     let var = "Hello again";
-    println!("Hello, world! {},{}", var, var);
-    secret_number_game();
-    println!("Program Over!");
+    //println!("Hello, world! {},{}", var, var);
+    //secret_number_game();
+    philosophers_problem();
+    //println!("Program Over!");
 }
 
 fn secret_number_game(){
@@ -48,6 +51,79 @@ fn secret_number_game(){
             Ordering::Greater => println!("Too Big"),
         }
     }
+
+    return;
+}
+
+
+
+
+
+
+struct Philosopher{
+    name: String,
+    left: usize,
+    right: usize,
+}
+impl Philosopher {
+    fn new(name: &str, left: usize, right: usize) -> Philosopher {
+        Philosopher {
+            name: name.to_string(),
+            left: left,
+            right: right,
+        }
+    }
+    fn eat(&self, table: &Table) {
+        let _left = table.forks[self.left].lock().unwrap();
+        let _right = table.forks[self.right].lock().unwrap();
+        println!("{} is eating.", self.name);
+        thread::sleep_ms(1000);
+        println!("{} is done eating.", self.name);
+    }
+}
+
+struct Table{
+    forks: Vec<Mutex<()>>,
+}
+
+
+
+
+fn philosophers_problem(){
+    let table = Arc::new(Table { forks: vec![
+        Mutex::new(()),
+        Mutex::new(()),
+        Mutex::new(()),
+        Mutex::new(()),
+        Mutex::new(()),
+    ]});
+    let philosophers = vec![
+        Philosopher::new("Ben",0,1),
+        Philosopher::new("David",1,2),
+        Philosopher::new("John",2,3),
+        Philosopher::new("Jack",3,4),
+        Philosopher::new("Matt",4,0),
+    ];
+
+
+    //Make them Eat!
+    //for p in &philosophers{
+    //    p.eat();
+    //}
+
+    //Make them Eat at the same time!!!!
+    let handles: Vec<_> = philosophers.into_iter().map(|p| {
+        let table = table.clone();
+        thread::spawn(move || {
+            p.eat(&table);
+        })
+    }).collect();
+    for h in handles {
+        h.join().unwrap();
+    }
+
+
+
 
     return;
 }
